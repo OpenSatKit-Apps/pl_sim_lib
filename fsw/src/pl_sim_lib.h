@@ -102,7 +102,7 @@ typedef struct
    PL_SIM_LIB_Power_t Power;
    uint16   PowerInitCycleCnt;
    uint16   PowerResetCycleCnt;
-   boolean  DetectorFaultPresent;
+   bool     DetectorFaultPresent;
 
 } PL_SIM_LIB_State_t;
 
@@ -113,7 +113,7 @@ typedef struct
    ** App Framework
    */ 
    
-   INITBL_Class  IniTbl;
+   INITBL_Class_t  IniTbl;
    
    /* 
    ** PL_SIM State
@@ -139,7 +139,7 @@ typedef struct
 **   1. This must be called prior to any other function.
 **
 */
-boolean PL_SIM_LIB_Constructor(PL_SIM_LIB_Class_t *PlSimPtr);
+bool PL_SIM_LIB_Constructor(PL_SIM_LIB_Class_t *PlSimPtr);
 
 
 /******************************************************************************

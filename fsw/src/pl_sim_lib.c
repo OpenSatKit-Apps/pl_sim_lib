@@ -45,7 +45,7 @@ typedef enum
 
 typedef struct
 {
-   boolean        Received;
+   bool               Received;
    PL_SIM_LIB_Power_t NewState;
      
 } PowerConfigCmd_t;
@@ -108,7 +108,7 @@ static const char FaultCorruptedChar[PL_SIM_LIB_DETECTOR_ROWS_PER_IMAGE] =
 /** Local Function Prototypes **/
 /*******************************/
 
-static void Detector_Init(boolean ClearImageCnt);
+static void Detector_Init(bool ClearImageCnt);
 static DetectorReadout_Enum_t Detector_Readout(void);
 
 
@@ -116,10 +116,10 @@ static DetectorReadout_Enum_t Detector_Readout(void);
 ** Function: PL_SIM_LIB_Constructor
 **
 */
-boolean PL_SIM_LIB_Constructor(PL_SIM_LIB_Class_t* PlSimLibPtr)
+bool PL_SIM_LIB_Constructor(PL_SIM_LIB_Class_t* PlSimLibPtr)
 {
  
-   boolean RetStatus = FALSE;
+   bool RetStatus = false;
  
    PlSimLib = PlSimLibPtr;
 
@@ -128,14 +128,14 @@ boolean PL_SIM_LIB_Constructor(PL_SIM_LIB_Class_t* PlSimLibPtr)
    
    PlSimLib->State.Power = PL_SIM_LIB_POWER_OFF;
    
-   Detector_Init(TRUE);
+   Detector_Init(true);
 
    /* IniTbl will report errors */
    if (INITBL_Constructor(INITBL_OBJ, PL_SIM_LIB_INI_FILENAME, &IniCfgEnum))
    {
       PlSimLib->Config.PowerInitCycleLim  = INITBL_GetIntConfig(INITBL_OBJ, CFG_PWR_INIT_CYCLES);
       PlSimLib->Config.PowerResetCycleLim = INITBL_GetIntConfig(INITBL_OBJ, CFG_PWR_RESET_CYCLES);
-      RetStatus = TRUE;
+      RetStatus = true;
    }
 
    return RetStatus;
@@ -161,7 +161,7 @@ void PL_SIM_LIB_ExecuteStep(void)
    if (PowerConfigCmd.Received)
    {
       
-      CFE_EVS_SendEvent (PL_SIM_LIB_PWR_TRANSITION_EID, CFE_EVS_INFORMATION,
+      CFE_EVS_SendEvent (PL_SIM_LIB_PWR_TRANSITION_EID, CFE_EVS_EventType_INFORMATION,
                          "PL_SIM transitioned from %s to %s",
                          PL_SIM_LIB_GetPowerStateStr(PlSimLib->State.Power),
                          PL_SIM_LIB_GetPowerStateStr(PowerConfigCmd.NewState));
@@ -171,11 +171,11 @@ void PL_SIM_LIB_ExecuteStep(void)
       PlSimLib->State.PowerResetCycleCnt = 0;
       if (PlSimLib->State.Power == PL_SIM_LIB_POWER_RESET)
       {
-         Detector_Init(FALSE);
+         Detector_Init(false);
       }
       else
       {
-         Detector_Init(TRUE);
+         Detector_Init(true);
       }
       
       CFE_PSP_MemSet((void*)&PowerConfigCmd, 0, sizeof(PowerConfigCmd_t));
@@ -194,7 +194,7 @@ void PL_SIM_LIB_ExecuteStep(void)
             
             PlSimLib->State.Power = PL_SIM_LIB_POWER_READY;
             
-            CFE_EVS_SendEvent (PL_SIM_LIB_PWR_INIT_COMPLETE_EID, CFE_EVS_INFORMATION,
+            CFE_EVS_SendEvent (PL_SIM_LIB_PWR_INIT_COMPLETE_EID, CFE_EVS_EventType_INFORMATION,
                                "PL_SIM completed initialization after power on in %d cycles.",
                                PlSimLib->State.PowerInitCycleCnt);
             
@@ -209,13 +209,13 @@ void PL_SIM_LIB_ExecuteStep(void)
          if (++PlSimLib->State.PowerResetCycleCnt >= PlSimLib->Config.PowerResetCycleLim) 
          {
             
-            CFE_EVS_SendEvent (PL_SIM_LIB_PWR_RESET_COMPLETE_EID, CFE_EVS_INFORMATION,
+            CFE_EVS_SendEvent (PL_SIM_LIB_PWR_RESET_COMPLETE_EID, CFE_EVS_EventType_INFORMATION,
                                "PL_SIM completed initialization after reset in %d cycles.",
                                PlSimLib->State.PowerResetCycleCnt);
 
             PlSimLib->State.Power = PL_SIM_LIB_POWER_READY;
             PlSimLib->State.PowerResetCycleCnt  = 0;
-            PlSimLib->State.DetectorFaultPresent = FALSE;
+            PlSimLib->State.DetectorFaultPresent = false;
          
          } /* End if init cycle complete */
 
@@ -224,14 +224,14 @@ void PL_SIM_LIB_ExecuteStep(void)
                   
       default:
          
-         CFE_EVS_SendEvent (PL_SIM_LIB_PWR_INVALID_STATE_EID, CFE_EVS_CRITICAL,
+         CFE_EVS_SendEvent (PL_SIM_LIB_PWR_INVALID_STATE_EID, CFE_EVS_EventType_CRITICAL,
                             "Invalid PL_SIM power state %d. Powering off instrument.",
                             PlSimLib->State.Power);
          
          PlSimLib->State.Power = PL_SIM_LIB_POWER_OFF;
          PlSimLib->State.PowerInitCycleCnt  = 0;
          PlSimLib->State.PowerResetCycleCnt = 0;
-         Detector_Init(TRUE);
+         Detector_Init(true);
 
    } /* End power state switch */
       
@@ -253,7 +253,7 @@ void PL_SIM_LIB_ExecuteStep(void)
 void PL_SIM_LIB_SetFault(void)
 {
    
-   PlSimLib->State.DetectorFaultPresent = TRUE;
+   PlSimLib->State.DetectorFaultPresent = true;
    
 } /* End PL_SIM_LIB_SetFault() */
 
@@ -272,7 +272,7 @@ void PL_SIM_LIB_SetFault(void)
 void PL_SIM_LIB_ClearFault(void)
 {
 
-   PlSimLib->State.DetectorFaultPresent = FALSE;
+   PlSimLib->State.DetectorFaultPresent = false;
    
 } /* End PL_SIM_LIB_ClearFault() */
 
@@ -291,7 +291,7 @@ void PL_SIM_LIB_ClearFault(void)
 void PL_SIM_LIB_PowerOn(void)
 {
 
-   PowerConfigCmd.Received = TRUE;
+   PowerConfigCmd.Received = true;
    PowerConfigCmd.NewState = PL_SIM_LIB_POWER_INIT;
  
 } /* End PL_SIM_LIB_PowerOn() */
@@ -309,7 +309,7 @@ void PL_SIM_LIB_PowerOn(void)
 void PL_SIM_LIB_PowerOff(void)
 {
 
-   PowerConfigCmd.Received = TRUE;
+   PowerConfigCmd.Received = true;
    PowerConfigCmd.NewState = PL_SIM_LIB_POWER_OFF;
    
 } /* End PL_SIM_LIB_PowerOff() */
@@ -328,7 +328,7 @@ void PL_SIM_LIB_PowerOff(void)
 void PL_SIM_LIB_PowerReset(void)
 {
 
-   PowerConfigCmd.Received = TRUE;
+   PowerConfigCmd.Received = true;
    PowerConfigCmd.NewState = PL_SIM_LIB_POWER_RESET;
    
 } /* End PL_SIM_LIB_PowerReset() */
@@ -421,7 +421,7 @@ const char* PL_SIM_LIB_GetPowerStateStr(PL_SIM_LIB_Power_t PowerState)
 ** Notes:
 **   None
 */
-static void Detector_Init(boolean ClearImageCnt)
+static void Detector_Init(bool ClearImageCnt)
 {
 
    PlSimLib->Detector.ReadoutRow  = 0;
@@ -480,7 +480,7 @@ static DetectorReadout_Enum_t Detector_Readout(void)
    else
    {
       
-      CFE_EVS_SendEvent (PL_SIM_LIB_DETECTOR_ERR_EID, CFE_EVS_CRITICAL, 
+      CFE_EVS_SendEvent (PL_SIM_LIB_DETECTOR_ERR_EID, CFE_EVS_EventType_CRITICAL, 
                          "Invalid detector row %d index exceeds fixed maximum row index of %d.",
                          PlSimLib->Detector.ReadoutRow, (PL_SIM_LIB_DETECTOR_ROWS_PER_IMAGE-1));
 
