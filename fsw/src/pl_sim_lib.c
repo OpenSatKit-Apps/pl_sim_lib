@@ -99,7 +99,11 @@ static const PL_SIM_LIB_DetectorRow_t DetectorRowImage[PL_SIM_LIB_DETECTOR_ROWS_
 static const char DetectorRowInitState[PL_SIM_LIB_DETECTOR_ROW_LEN] = 
    { ',','I','n','i','t','i','a','l',' ','S','t','a','t','e','\n' };
 
-/* Only one character is substituted per sample when a fault is present */ 
+/*
+** Only one character is substituted per sample when a fault is present
+** An image containing a character in the first byte is how a fault is
+** detected by the payload manager app.  
+*/
 static const char FaultCorruptedChar[PL_SIM_LIB_DETECTOR_ROWS_PER_IMAGE] = 
    { 70, 65, 85, 76, 84, 65, 76, 69, 82, 84 };
 
@@ -162,7 +166,7 @@ void PL_SIM_LIB_ExecuteStep(void)
    {
       
       CFE_EVS_SendEvent (PL_SIM_LIB_PWR_TRANSITION_EID, CFE_EVS_EventType_INFORMATION,
-                         "PL_SIM transitioned from %s to %s",
+                         "PL_SIM power transitioned from %s to %s",
                          PL_SIM_LIB_GetPowerStateStr(PlSimLib->State.Power),
                          PL_SIM_LIB_GetPowerStateStr(PowerConfigCmd.NewState));
       
