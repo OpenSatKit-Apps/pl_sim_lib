@@ -452,31 +452,28 @@ static DetectorReadout_Enum_t Detector_Readout(void)
 
    DetectorReadout_Enum_t DetectorReadout = DETECTOR_READOUT_FALSE;
    
-   if (PlSimLib->Detector.ReadoutRow < PL_SIM_LIB_DETECTOR_ROWS_PER_IMAGE)
+   if (PlSimLib->State.DetectorReadoutRow < PL_SIM_LIB_DETECTOR_ROWS_PER_IMAGE)
    {
    
+      PlSimLib->Detector.ReadoutRow = PlSimLib->State.DetectorReadoutRow;
       strncpy (PlSimLib->Detector.Row.Data, DetectorRowImage[PlSimLib->Detector.ReadoutRow].Data, PL_SIM_LIB_DETECTOR_ROW_LEN);
       
-      /* Corrupt firt column of data when a fault is present */
+      DetectorReadout = DETECTOR_READOUT_TRUE;
+            
+      /* Corrupt first column of data when a fault is present */
       if (PlSimLib->State.DetectorFaultPresent)
       {
          PlSimLib->Detector.Row.Data[0] = FaultCorruptedChar[PlSimLib->Detector.ReadoutRow];
       }
          
-      PlSimLib->Detector.ReadoutRow++;
-      if (PlSimLib->Detector.ReadoutRow < PL_SIM_LIB_DETECTOR_ROWS_PER_IMAGE)
+      PlSimLib->State.DetectorReadoutRow++;
+      if (PlSimLib->State.DetectorReadoutRow >= PL_SIM_LIB_DETECTOR_ROWS_PER_IMAGE)
       {
       
-         DetectorReadout = DETECTOR_READOUT_TRUE;
-      
-      }
-      else
-      {
-       
-         PlSimLib->Detector.ReadoutRow = 0;
-         PlSimLib->Detector.ImageCnt++;
+        PlSimLib->State.DetectorReadoutRow = 0;
+        PlSimLib->Detector.ImageCnt++;
          
-         DetectorReadout = DETECTOR_READOUT_LAST;
+        DetectorReadout = DETECTOR_READOUT_LAST;
       
       }
       
@@ -486,9 +483,9 @@ static DetectorReadout_Enum_t Detector_Readout(void)
       
       CFE_EVS_SendEvent (PL_SIM_LIB_DETECTOR_ERR_EID, CFE_EVS_EventType_CRITICAL, 
                          "Invalid detector row %d index exceeds fixed maximum row index of %d.",
-                         PlSimLib->Detector.ReadoutRow, (PL_SIM_LIB_DETECTOR_ROWS_PER_IMAGE-1));
+                         PlSimLib->State.DetectorReadoutRow, (PL_SIM_LIB_DETECTOR_ROWS_PER_IMAGE-1));
 
-      PlSimLib->Detector.ReadoutRow = 0;
+      PlSimLib->State.DetectorReadoutRow = 0;
    
    }
    

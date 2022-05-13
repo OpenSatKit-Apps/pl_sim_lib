@@ -100,9 +100,10 @@ typedef struct
 {
 
    PL_SIM_LIB_Power_t Power;
-   uint16   PowerInitCycleCnt;
-   uint16   PowerResetCycleCnt;
-   bool     DetectorFaultPresent;
+   uint16  PowerInitCycleCnt;
+   uint16  PowerResetCycleCnt;
+   uint16  DetectorReadoutRow; 
+   bool    DetectorFaultPresent;
 
 } PL_SIM_LIB_State_t;
 
