@@ -1,17 +1,28 @@
 /*
-** Purpose: Implement the Payload Simulator Library
+**  Copyright 2022 bitValence, Inc.
+**  All Rights Reserved.
 **
-** Notes:
+**  This program is free software; you can modify and/or redistribute it
+**  under the terms of the GNU Affero General Public License
+**  as published by the Free Software Foundation; version 3 with
+**  attribution addendums as found in the LICENSE.txt
+**
+**  This program is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**  GNU Affero General Public License for more details.
+**
+**  Purpose:
+**    Implement the Payload Simulator Library
+**
+**  Notes:
 **   1. Information events are used in order to trace execution for
 **      demonstrations.
 **
-** License:
-**   Written by David McComas and licensed under the GNU
-**   Lesser General Public License (LGPL).
+**  References:
+**    1. OpenSatKit Object-based Application Developer's Guide.
+**    2. cFS Application Developer's Guide.
 **
-** References:
-**   1. OpenSatKit Object-based Application Developers Guide.
-**   2. cFS Application Developer's Guide.
 */
 
 /*
@@ -148,6 +159,25 @@ bool PL_SIM_LIB_Constructor(PL_SIM_LIB_Class_t* PlSimLibPtr)
 
 
 /******************************************************************************
+** Functions: PL_SIM_LIB_ClearFault
+**
+** Clear fault state.
+**
+** Notes:
+**   1. No return status required, the simulated fault is always cleared.
+**   2. Fault is set immediately unlike the power configurations that are
+**      processed during the ExecuteStep() function
+**
+*/
+void PL_SIM_LIB_ClearFault(void)
+{
+
+   PlSimLib->State.DetectorFaultPresent = false;
+   
+} /* End PL_SIM_LIB_ClearFault() */
+
+
+/******************************************************************************
 ** Function: PL_SIM_LIB_ExecuteStep
 **
 ** Execute instrument simulation cycle. Command functions can set state flags
@@ -244,42 +274,44 @@ void PL_SIM_LIB_ExecuteStep(void)
 
 
 /******************************************************************************
-** Functions: PL_SIM_LIB_SetFault
+** Functions: PL_SIM_LIB_GetPowerStateStr
 **
-** Set fault state to true
+** Read the state of the library simulation
 **
 ** Notes:
-**   1. No return status required, the simulated fault is always set.
-**   2. Fault is set immediately unlike the power configurations that are
-**      processed during the ExecuteStep() function
+**  1. In a non-simulated environment this would not exist.
 **
 */
-void PL_SIM_LIB_SetFault(void)
+const char* PL_SIM_LIB_GetPowerStateStr(PL_SIM_LIB_Power_t PowerState)
 {
+   uint8 i = 0;
    
-   PlSimLib->State.DetectorFaultPresent = true;
+   if (PowerState <= PL_SIM_LIB_POWER_READY)
+   {
+      i = PowerState;
+   }
    
-} /* End PL_SIM_LIB_SetFault() */
+   return PwrStateStr[i];
+   
+} /* PL_SIM_LIB_GetPowerStateStr() */
 
 
 /******************************************************************************
-** Functions: PL_SIM_LIB_ClearFault
+** Functions: PL_SIM_LIB_PowerOff
 **
-** Clear fault state.
+** Power off the simulated payload
 **
 ** Notes:
-**   1. No return status required, the simulated fault is always cleared.
-**   2. Fault is set immediately unlike the power configurations that are
-**      processed during the ExecuteStep() function
+**   1. No return status required, power is always set to false.
 **
 */
-void PL_SIM_LIB_ClearFault(void)
+void PL_SIM_LIB_PowerOff(void)
 {
 
-   PlSimLib->State.DetectorFaultPresent = false;
+   PowerConfigCmd.Received = true;
+   PowerConfigCmd.NewState = PL_SIM_LIB_POWER_OFF;
    
-} /* End PL_SIM_LIB_ClearFault() */
-
+} /* End PL_SIM_LIB_PowerOff() */
 
 
 /******************************************************************************
@@ -302,24 +334,6 @@ void PL_SIM_LIB_PowerOn(void)
 
 
 /******************************************************************************
-** Functions: PL_SIM_LIB_PowerOff
-**
-** Power off the simulated payload
-**
-** Notes:
-**   1. No return status required, power is always set to false.
-**
-*/
-void PL_SIM_LIB_PowerOff(void)
-{
-
-   PowerConfigCmd.Received = true;
-   PowerConfigCmd.NewState = PL_SIM_LIB_POWER_OFF;
-   
-} /* End PL_SIM_LIB_PowerOff() */
-
-
-/******************************************************************************
 ** Functions: PL_SIM_LIB_PowerReset
 **
 ** Reset power on the simulated payload
@@ -336,24 +350,6 @@ void PL_SIM_LIB_PowerReset(void)
    PowerConfigCmd.NewState = PL_SIM_LIB_POWER_RESET;
    
 } /* End PL_SIM_LIB_PowerReset() */
-
-
-/******************************************************************************
-** Functions: PL_SIM_LIB_ReadPowerState
-**
-** Read the current power state of the payload
-**
-** Notes:
-**  1. In a non-simulated environment this would be read across a hardware
-**     interface.
-**
-*/
-PL_SIM_LIB_Power_t PL_SIM_LIB_ReadPowerState(void)
-{
-   
-   return PlSimLib->State.Power;
-   
-} /* End PL_SIM_LIB_ReadPowerState() */
 
 
 /******************************************************************************
@@ -378,6 +374,24 @@ void PL_SIM_LIB_ReadDetector(PL_SIM_LIB_Detector_t *Detector)
 
 
 /******************************************************************************
+** Functions: PL_SIM_LIB_ReadPowerState
+**
+** Read the current power state of the payload
+**
+** Notes:
+**  1. In a non-simulated environment this would be read across a hardware
+**     interface.
+**
+*/
+PL_SIM_LIB_Power_t PL_SIM_LIB_ReadPowerState(void)
+{
+   
+   return PlSimLib->State.Power;
+   
+} /* End PL_SIM_LIB_ReadPowerState() */
+
+
+/******************************************************************************
 ** Functions: PL_SIM_LIB_ReadState
 **
 ** Read the state of the library simulation
@@ -395,26 +409,22 @@ void PL_SIM_LIB_ReadState(PL_SIM_LIB_Class_t *PlSimLibObj)
 
 
 /******************************************************************************
-** Functions: PL_SIM_LIB_GetPowerStateStr
+** Functions: PL_SIM_LIB_SetFault
 **
-** Read the state of the library simulation
+** Set fault state to true
 **
 ** Notes:
-**  1. In a non-simulated environment this would not exist.
+**   1. No return status required, the simulated fault is always set.
+**   2. Fault is set immediately unlike the power configurations that are
+**      processed during the ExecuteStep() function
 **
 */
-const char* PL_SIM_LIB_GetPowerStateStr(PL_SIM_LIB_Power_t PowerState)
+void PL_SIM_LIB_SetFault(void)
 {
-   uint8 i = 0;
    
-   if (PowerState <= PL_SIM_LIB_POWER_READY)
-   {
-      i = PowerState;
-   }
+   PlSimLib->State.DetectorFaultPresent = true;
    
-   return PwrStateStr[i];
-   
-} /* PL_SIM_LIB_GetPowerStateStr() */
+} /* End PL_SIM_LIB_SetFault() */
 
 
 /******************************************************************************

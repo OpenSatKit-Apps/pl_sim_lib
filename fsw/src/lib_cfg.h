@@ -1,24 +1,33 @@
 /*
-** Purpose: Define configurations for the Payload Simulator Library
+**  Copyright 2022 bitValence, Inc.
+**  All Rights Reserved.
 **
-** Notes:
-**   1. These macros can only be built with the application and can't
-**      have a platform scope because the same file name is used for
-**      all applications following the object-based application design.
-**   2. This must be named lib_cfg.h and not app_cfg.h because apps
-**      need to add the library soucre directory to their include
-**      search path and they'd get a conflict with app_cfg.h.
+**  This program is free software; you can modify and/or redistribute it
+**  under the terms of the GNU Affero General Public License
+**  as published by the Free Software Foundation; version 3 with
+**  attribution addendums as found in the LICENSE.txt
 **
-** License:
-**   Written by David McComas and licensed under the GNU
-**   Lesser General Public License (LGPL).
+**  This program is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**  GNU Affero General Public License for more details.
 **
-** References:
-**   1. OpenSatKit Object-based Application Developers Guide.
-**   2. cFS Application Developer's Guide.
+**  Purpose:
+**    Define configurations for the Payload Simulator Library
+**
+**  Notes:
+**    1. These macros can only be built with the application and can't
+**       have a platform scope because the same file name is used for
+**       all applications following the object-based application design.
+**    2. This must be named lib_cfg.h and not app_cfg.h because apps
+**       need to add the library soucre directory to their include
+**       search path and they'd get a conflict with app_cfg.h.
+**
+**  References:
+**    1. OpenSatKit Object-based Application Developer's Guide.
+**    2. cFS Application Developer's Guide.
 **
 */
-
 #ifndef _lib_cfg_
 #define _lib_cfg_
 
@@ -40,8 +49,8 @@
 ** 1.0 - Initial release based on OSK Instrument Simulator(ISIM)
 */
 
-#define  PL_SIM_LIB_MAJOR_VER   1
-#define  PL_SIM_LIB_MINOR_VER   0
+#define  PL_SIM_LIB_MAJOR_VER   0
+#define  PL_SIM_LIB_MINOR_VER   9
 
 
 /******************************************************************************
